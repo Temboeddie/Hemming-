@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hamming Code</title>
+    <script>
+        function encode() {
+            let inputText = document.getElementById('inputMessage').value;
+            inputText = inputText.split('');
+            for (let i = 0; i < inputText.length; i++) {
+                inputText[i] = parseInt(inputText[i]);
+            }
+
+            // Hamming(7,4) encoding
+            let c1 = (inputText[0] + inputText[1] + inputText[3]) % 2;
+            let c2 = (inputText[0] + inputText[2] + inputText[3]) % 2;
+            let c3 = (inputText[1] + inputText[2] + inputText[3]) % 2;
+
+            document.getElementById('outputMessage').value = inputText.join('') + c1 + c2 + c3 + inputText[0] + inputText[1] + inputText[2] + inputText[3];
+        }
+
+        function decode() {
+            let codedMessage = document.getElementById('outputMessage').value;
+            let codedArray = codedMessage.split('');
+            for (let i = 0; i < codedArray.length; i++) {
+                codedArray[i] = parseInt(codedArray[i]);
+            }
+
+            // Hamming(7,4) decoding
+            let c1 = (codedArray[4] + codedArray[5] + codedArray[6] + codedArray[7]) % 2;
+            let c2 = (codedArray[2] + codedArray[3] + codedArray[6] + codedArray[7]) % 2;
+            let c3 = (codedArray[1] + codedArray[3] + codedArray[5] + codedArray[7]) % 2;
+
+            let errorPosition = c1 + c2 * 2 + c3 * 4;
+
+            if (errorPosition === 0) {
+                document.getElementById('originalMessage').value = codedArray[2] + codedArray[4] + codedArray[5] + codedArray[6];
+            } else {
+                // Error detected, correct if possible
+                codedArray[errorPosition - 1] = (codedArray[errorPosition - 1] + 1) % 2;
+                document.getElementById('originalMessage').value = codedArray[2] + codedArray[4] + codedArray[5] + codedArray[6];
+                document.getElementById('errorStatus').innerText = `Error detected and corrected at bit ${errorPosition}`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Edward's hamming code</h1>
+    <p><input type="text" id="inputMessage" value="1101" /> Input message, 4 bits</p>
+    <p><input type="button" value="Encode" onclick="encode()" /></p>
+    <p><input type="text" id="outputMessage" /> Coded message</p>
+    <p><input type="button" value="Decode" onclick="decode()" /></p>
+    <p><input type="text" id="originalMessage" /> Decoded message</p>
+    <p id="errorStatus"></p>
+</body>
+</html>
